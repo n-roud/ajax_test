@@ -26,14 +26,24 @@ class TestAppium(unittest.TestCase):
         if self.driver:
             self.driver.quit()
 
+    def test_positive_login(self) -> None:
+        self.login("qa.ajax.app.automation@gmail.com", "qa_automation_password")
+
+        self.driver.find_element(by=AppiumBy.ID, value='com.ajaxsystems:id/actionbar')
+
     @parameterized.expand([
-        ("valid_credentials", "qa.ajax.app.automation@gmail.com", "qa_automation_password", True),
-        ("invalid_email", "invalid_email", "qa_automation_password", False),
-        ("invalid_password", "qa.ajax.app.automation@gmail.com", "invalid_password", False)
+        ("invalid_email_format", "invalid_email", "any_password", "Invalid email format"),
+        ("wrong_password_or_login", "login@gmail.com", "invalid_password", "Wrong login or password")
     ])
-    def test_login(self, name, email, password, expected_result) -> None:
-        el = self.driver.find_element(by=AppiumBy.ID, value='com.ajaxsystems:id/login')
-        el.click()
+    def test_negative_login(self, name, email, password, expected_message) -> None:
+        self.login(email, password)
+
+        snackbar = self.driver.find_element(by=AppiumBy.ID, value='com.ajaxsystems:id/snackbar_text')
+        self.assertEquals(snackbar.text, expected_message)
+
+    def login(self, email, password):
+        enter_button = self.driver.find_element(by=AppiumBy.ID, value='com.ajaxsystems:id/login')
+        enter_button.click()
 
         password_field = self.driver.find_element(by=AppiumBy.ID, value='com.ajaxsystems:id/password')
         password_field.send_keys(password)
@@ -43,9 +53,3 @@ class TestAppium(unittest.TestCase):
 
         login_button = self.driver.find_element(by=AppiumBy.ID, value='com.ajaxsystems:id/next')
         login_button.click()
-
-        self.driver.find_element(by=AppiumBy.ID, value='com.ajaxsystems:id/actionbar')
-
-
-if __name__ == '__main__':
-    unittest.main()
