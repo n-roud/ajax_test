@@ -1,3 +1,4 @@
+import subprocess
 import unittest
 from appium import webdriver
 from appium.webdriver.common.appiumby import AppiumBy
@@ -19,6 +20,15 @@ capabilities = dict(
 appium_server_url = 'http://localhost:4723'
 
 
+def get_udid():
+    output = subprocess.check_output(['adb', 'devices']).decode()
+    devices = output.strip().split('\n')[1:]
+    for device in devices:
+        if 'device' in device:
+            udid = device.split('\t')[0]
+            return udid
+
+
 class TestAppium(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -33,6 +43,8 @@ class TestAppium(unittest.TestCase):
     def setUp(self) -> None:
         self.driver = webdriver.Remote(appium_server_url, capabilities)
         self.driver.implicitly_wait(10)
+        udid = get_udid()
+        self.logger.info(f'Starting test case on device with udid:"{udid}"')
 
     def tearDown(self) -> None:
         if self.driver:
