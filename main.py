@@ -69,6 +69,31 @@ class TestAppium(unittest.TestCase):
 
         self.logger.info(f'Test "{name}" passed with message "{expected_message}"')
 
+    @parameterized.expand([
+        ("Add hub", "com.ajaxsystems:id/addHub", "com.ajaxsystems:id/addHubPickOptionContainer"),
+        ("App Settings", "com.ajaxsystems:id/settings", "com.ajaxsystems:id/accountInfoEditAccountNavigate"),
+        ("Help", "com.ajaxsystems:id/help", "com.ajaxsystems:id/navigation"),
+        ("Report a problem", "com.ajaxsystems:id/logs", "com.ajaxsystems:id/content"),
+        ("Video Surveillance", "com.ajaxsystems:id/camera", "com.ajaxsystems:id/hikvision"),
+        ("Terms of Service", "com.ajaxsystems:id/documentation_text", "com.ajaxsystems:id/back")
+    ])
+    def test_sidebar_menu(self, name, item_id, item_page) -> None:
+        # log in with valid credentials
+        self.login("qa.ajax.app.automation@gmail.com", "qa_automation_password")
+
+        # Open Sidebar menu
+        sidebar = self.driver.find_element(by=AppiumBy.ID, value="com.ajaxsystems:id/menuDrawer")
+        sidebar.click()
+        self.logger.info('Opened Sidebar menu')
+
+        # Click on sidebar item
+        item = self.driver.find_element(by=AppiumBy.ID, value=item_id)
+        item.click()
+        self.logger.info(f'Clicked on {name} in Sidebar menu')
+
+        self.driver.find_element(by=AppiumBy.ID, value=item_page)
+        self.logger.info(f'Test "test_sidebar_menu" for {name} passed')
+
     def login(self, email, password):
         enter_button = self.driver.find_element(by=AppiumBy.ID, value='com.ajaxsystems:id/login')
         enter_button.click()
